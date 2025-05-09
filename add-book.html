@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add New Book</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <i class="fas fa-book-reader"></i>
+      Library Management
+    </div>
+    <div class="nav-links">
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <a href="books.html"><i class="fas fa-book"></i> Books</a>
+      <a href="add-book.html" class="active"><i class="fas fa-plus"></i> Add Book</a>
+      <a href="search.html"><i class="fas fa-search"></i> Search</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1><i class="fas fa-plus-circle"></i> Add New Book</h1>
+      <p class="subtitle">Fill in the details to add a new book to the library</p>
+    </div>
+
+    <div class="form-container">
+      <form id="addBookForm" class="book-form">
+        <div class="form-group">
+          <label for="title">
+            <i class="fas fa-book"></i> Title
+          </label>
+          <input type="text" class="form-control" id="title" 
+                 placeholder="Enter book title" required
+                 pattern="[A-Za-z0-9\s.,'-]+" 
+                 title="Please enter a valid book title">
+          <small class="form-text">Enter the complete title of the book</small>
+        </div>
+
+        <div class="form-group">
+          <label for="author">
+            <i class="fas fa-user"></i> Author
+          </label>
+          <input type="text" class="form-control" id="author" 
+                 placeholder="Enter author name" required
+                 pattern="[A-Za-z\s.,'-]+" 
+                 title="Please enter a valid author name">
+          <small class="form-text">Enter the author's full name</small>
+        </div>
+
+        <div class="form-group">
+          <label for="isbn">
+            <i class="fas fa-barcode"></i> ISBN
+          </label>
+          <input type="text" class="form-control" id="isbn" 
+                 placeholder="Enter ISBN number" required
+                 pattern="[0-9-]+" 
+                 title="Please enter a valid ISBN number">
+          <small class="form-text">Enter the 13-digit ISBN number</small>
+        </div>
+
+        <div class="form-group">
+          <label for="genre">
+            <i class="fas fa-tags"></i> Genre
+          </label>
+          <select class="form-control" id="genre" required>
+            <option value="">Select a genre</option>
+            <option value="Fiction">Fiction</option>
+            <option value="Non-Fiction">Non-Fiction</option>
+            <option value="Science Fiction">Science Fiction</option>
+            <option value="Mystery">Mystery</option>
+            <option value="Romance">Romance</option>
+            <option value="Fantasy">Fantasy</option>
+            <option value="Biography">Biography</option>
+            <option value="History">History</option>
+          </select>
+          <small class="form-text">Select the book's genre</small>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-save"></i> Add Book
+          </button>
+          <a href="books.html" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="main.js"></script>
+</body>
+</html>

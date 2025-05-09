@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Update Book</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Update Book</h1>
+    <a href="index.html" class="btn btn-secondary mb-3">🏠 Home</a>
+    <form id="updateBookForm">
+      <div class="mb-3">
+        <input type="text" class="form-control" id="title" placeholder="Title">
+      </div>
+      <div class="mb-3">
+        <input type="text" class="form-control" id="author" placeholder="Author">
+      </div>
+      <div class="mb-3">
+        <input type="text" class="form-control" id="isbn" placeholder="ISBN">
+      </div>
+      <button type="submit" class="btn btn-primary">Update Book</button>
+    </form>
+  </div>
+  <script>
+    const id = new URLSearchParams(window.location.search).get("id");
+    fetch(`/books/${id}`)
+      .then(res => res.json())
+      .then(book => {
+        document.getElementById("title").value = book.title;
+        document.getElementById("author").value = book.author;
+        document.getElementById("isbn").value = book.isbn;
+      });
+
+    document.getElementById("updateBookForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const updatedBook = {
+        title: document.getElementById("title").value,
+        author: document.getElementById("author").value,
+        isbn: document.getElementById("isbn").value
+      };
+      fetch(`/books/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedBook)
+      }).then(() => {
+        alert("Book updated!");
+        window.location.href = "books.html";
+      });
+    });
+  </script>
+</body>
+</html>
