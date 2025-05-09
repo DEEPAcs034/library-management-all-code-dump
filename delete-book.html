@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delete Book</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">Library Management</div>
+    <div class="nav-links">
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <a href="books.html"><i class="fas fa-book"></i> Books</a>
+      <a href="add-book.html"><i class="fas fa-plus"></i> Add Book</a>
+      <a href="update-book.html"><i class="fas fa-edit"></i> Update Book</a>
+      <a href="search.html"><i class="fas fa-search"></i> Search</a>
+      <a href="delete-book.html" class="active"><i class="fas fa-trash"></i> Delete Book</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1><i class="fas fa-trash"></i> Delete Book</h1>
+    </div>
+    <div class="form-container">
+      <form id="deleteBookForm" class="book-form">
+        <div class="form-group">
+          <label for="bookId">
+            <i class="fas fa-hashtag"></i> Book ID
+          </label>
+          <input type="number" class="form-control" id="bookId" placeholder="Enter Book ID to delete" required>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Delete Book
+          </button>
+          <a href="books.html" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Cancel
+          </a>
+        </div>
+      </form>
+      <div id="deleteResult"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("deleteBookForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const bookId = document.getElementById("bookId").value;
+      const resultDiv = document.getElementById("deleteResult");
+      resultDiv.innerHTML = '<div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Deleting...</div>';
+
+      fetch(`/books/${bookId}`, {
+        method: "DELETE"
+      })
+      .then(response => {
+        if (response.ok) {
+          resultDiv.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Book deleted successfully!</div>';
+          setTimeout(() => window.location.href = "books.html", 1500);
+        } else {
+          return response.json().then(data => {
+            throw new Error(data.message || "Book not found or could not be deleted.");
+          });
+        }
+      })
+      .catch(error => {
+        resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> Failed to delete</div>`;
+      });
+    });
+  </script>
+</body>
+</html>

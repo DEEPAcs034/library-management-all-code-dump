@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>All Books</title>
-  <link rel="stylesheet" href="style1.css">
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -14,7 +14,9 @@
       <a href="index.html"><i class="fas fa-home"></i> Home</a>
       <a href="books.html" class="active"><i class="fas fa-book"></i> Books</a>
       <a href="add-book.html"><i class="fas fa-plus"></i> Add Book</a>
+      <a href="update-book.html"><i class="fas fa-edit"></i> Update Book</a>
       <a href="search.html"><i class="fas fa-search"></i> Search</a>
+      <a href="delete-book.html"><i class="fas fa-trash"></i> Delete Book</a>
     </div>
   </nav>
 
@@ -37,6 +39,7 @@
               <th>Title</th>
               <th>Author</th>
               <th>ISBN</th>
+              <th>Quantity</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -46,7 +49,139 @@
     </div>
   </div>
 
-  <script src="main.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Add loading animation
+    document.getElementById('booksTableBody').innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center">
+          <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i> Loading books...
+          </div>
+        </td>
+      </tr>
+    `;
 
+    fetch("/books")
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById("booksTableBody");
+        if (data.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" class="text-center">
+                <div class="empty-state">
+                  <i class="fas fa-book-open"></i>
+                  <p>No books found. Add your first book!</p>
+                  <a href="add-book.html" class="btn btn-success">Add Book</a>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+        
+        tbody.innerHTML = data.map(book => `
+          <tr data-id="${book.id}">
+            <td>${book.id || 'N/A'}</td>
+            <td>${book.title || 'N/A'}</td>
+            <td>${book.author || 'N/A'}</td>
+            <td>${book.isbn || 'N/A'}</td>
+            <td>${book.quantity || 'N/A'}</td>
+            <td>
+              <div class="action-buttons">
+                <a href="update-book.html?id=${book.id}" class="btn btn-sm btn-warning">
+                  <i class="fas fa-edit"></i> Edit
+                </a>
+                <button onclick="deleteBook('${book.id}')" class="btn btn-sm btn-danger">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      })
+      .catch(error => {
+        document.getElementById('booksTableBody').innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center error-message">
+              <i class="fas fa-exclamation-circle"></i>
+              <p>Error loading books. Please try again later.</p>
+            </td>
+          </tr>
+        `;
+      });
+
+    function deleteBook(id) {
+      console.log("Deleting book with ID:", id);
+      if (confirm('Are you sure you want to delete this book?')) {
+        fetch(`http://localhost:8080/books/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to delete book');
+          }
+          // Remove the row from the table immediately
+          const row = document.querySelector(`tr[data-id="${id}"]`);
+          if (row) {
+            row.remove();
+          }
+          // Show success message
+          alert('Book deleted successfully!');
+          // Refresh the table data
+          fetch("/books")
+            .then(res => res.json())
+            .then(data => {
+              const tbody = document.getElementById("booksTableBody");
+              if (data.length === 0) {
+                tbody.innerHTML = `
+                  <tr>
+                    <td colspan="6" class="text-center">
+                      <div class="empty-state">
+                        <i class="fas fa-book-open"></i>
+                        <p>No books found. Add your first book!</p>
+                        <a href="add-book.html" class="btn btn-success">Add Book</a>
+                      </div>
+                    </td>
+                  </tr>
+                `;
+                return;
+              }
+              
+              tbody.innerHTML = data.map(book => `
+                <tr data-id="${book.id}">
+                  <td>${book.id || 'N/A'}</td>
+                  <td>${book.title || 'N/A'}</td>
+                  <td>${book.author || 'N/A'}</td>
+                  <td>${book.isbn || 'N/A'}</td>
+                  <td>${book.quantity || 'N/A'}</td>
+                  <td>
+                    <div class="action-buttons">
+                      <a href="update-book.html?id=${book.id}" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i> Edit
+                      </a>
+                      <button onclick="deleteBook('${book.id}')" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `).join('');
+            })
+            .catch(error => {
+              console.error('Error refreshing table:', error);
+            });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Failed to delete book. Please try again.');
+        });
+      }
+    }
+  </script>
 </body>
 </html>

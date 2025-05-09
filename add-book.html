@@ -9,14 +9,12 @@
 </head>
 <body>
   <nav class="navbar">
-    <div class="nav-brand">
-      <i class="fas fa-book-reader"></i>
-      Library Management
-    </div>
+    <div class="nav-brand">Library Management</div>
     <div class="nav-links">
       <a href="index.html"><i class="fas fa-home"></i> Home</a>
       <a href="books.html"><i class="fas fa-book"></i> Books</a>
       <a href="add-book.html" class="active"><i class="fas fa-plus"></i> Add Book</a>
+      <a href="update-book.html"><i class="fas fa-edit"></i> Update Book</a>
       <a href="search.html"><i class="fas fa-search"></i> Search</a>
     </div>
   </nav>
@@ -24,60 +22,36 @@
   <div class="container">
     <div class="page-header">
       <h1><i class="fas fa-plus-circle"></i> Add New Book</h1>
-      <p class="subtitle">Fill in the details to add a new book to the library</p>
     </div>
 
     <div class="form-container">
       <form id="addBookForm" class="book-form">
         <div class="form-group">
+          <label for="id">
+            <i class="fas fa-hashtag"></i> Book ID
+          </label>
+          <input type="number" class="form-control" id="id" placeholder="Enter Book ID (optional)">
+        </div>
+
+        <div class="form-group">
           <label for="title">
             <i class="fas fa-book"></i> Title
           </label>
-          <input type="text" class="form-control" id="title" 
-                 placeholder="Enter book title" required
-                 pattern="[A-Za-z0-9\s.,'-]+" 
-                 title="Please enter a valid book title">
-          <small class="form-text">Enter the complete title of the book</small>
+          <input type="text" class="form-control" id="title" placeholder="Enter book title" required>
         </div>
 
         <div class="form-group">
           <label for="author">
             <i class="fas fa-user"></i> Author
           </label>
-          <input type="text" class="form-control" id="author" 
-                 placeholder="Enter author name" required
-                 pattern="[A-Za-z\s.,'-]+" 
-                 title="Please enter a valid author name">
-          <small class="form-text">Enter the author's full name</small>
+          <input type="text" class="form-control" id="author" placeholder="Enter author name" required>
         </div>
 
         <div class="form-group">
           <label for="isbn">
             <i class="fas fa-barcode"></i> ISBN
           </label>
-          <input type="text" class="form-control" id="isbn" 
-                 placeholder="Enter ISBN number" required
-                 pattern="[0-9-]+" 
-                 title="Please enter a valid ISBN number">
-          <small class="form-text">Enter the 13-digit ISBN number</small>
-        </div>
-
-        <div class="form-group">
-          <label for="genre">
-            <i class="fas fa-tags"></i> Genre
-          </label>
-          <select class="form-control" id="genre" required>
-            <option value="">Select a genre</option>
-            <option value="Fiction">Fiction</option>
-            <option value="Non-Fiction">Non-Fiction</option>
-            <option value="Science Fiction">Science Fiction</option>
-            <option value="Mystery">Mystery</option>
-            <option value="Romance">Romance</option>
-            <option value="Fantasy">Fantasy</option>
-            <option value="Biography">Biography</option>
-            <option value="History">History</option>
-          </select>
-          <small class="form-text">Select the book's genre</small>
+          <input type="text" class="form-control" id="isbn" placeholder="Enter ISBN number" required>
         </div>
 
         <div class="form-actions">
@@ -92,7 +66,67 @@
     </div>
   </div>
 
-  <div id="toast" class="toast"></div>
-  <script src="main.js"></script>
+  <script>
+    document.getElementById("addBookForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      
+      // Show loading state
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+      submitBtn.disabled = true;
+
+      const book = {
+        id: document.getElementById("id").value,
+        title: document.getElementById("title").value,
+        author: document.getElementById("author").value,
+        isbn: document.getElementById("isbn").value
+      };
+
+      fetch("/books", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(book)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(() => {
+        // Show success message
+        const successMessage = document.createElement('div');
+        successMessage.className = 'alert alert-success';
+        successMessage.innerHTML = `
+          <i class="fas fa-check-circle"></i>
+          Book added successfully!
+        `;
+        document.querySelector('.form-container').prepend(successMessage);
+
+        // Reset form
+        document.getElementById("addBookForm").reset();
+
+        // Redirect after delay
+        setTimeout(() => {
+          window.location.href = "books.html";
+        }, 1500);
+      })
+      .catch(error => {
+        // Show error message
+        const errorMessage = document.createElement('div');
+        errorMessage.className = 'alert alert-danger';
+        errorMessage.innerHTML = `
+          <i class="fas fa-exclamation-circle"></i>
+          Error adding book. Please try again.
+        `;
+        document.querySelector('.form-container').prepend(errorMessage);
+
+        // Reset button state
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      });
+    });
+  </script>
 </body>
 </html>

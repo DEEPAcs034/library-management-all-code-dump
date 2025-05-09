@@ -3,24 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <title>Update Book</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+  <nav class="navbar">
+    <div class="nav-brand">Library Management</div>
+    <div class="nav-links">
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <a href="books.html"><i class="fas fa-book"></i> Books</a>
+      <a href="add-book.html"><i class="fas fa-plus"></i> Add Book</a>
+      <a href="update-book.html" class="active"><i class="fas fa-edit"></i> Update Book</a>
+      <a href="search.html"><i class="fas fa-search"></i> Search</a>
+    </div>
+  </nav>
   <div class="container">
-    <h1>Update Book</h1>
-    <a href="index.html" class="btn btn-secondary mb-3">🏠 Home</a>
-    <form id="updateBookForm">
-      <div class="mb-3">
-        <input type="text" class="form-control" id="title" placeholder="Title">
+    <div class="page-header">
+      <h1><i class="fas fa-edit"></i> Update Book</h1>
+    </div>
+    <div class="search-box">
+      <div class="search-input-group">
+        <input type="text" id="searchInput" class="form-control" 
+               placeholder="Search by title, author, or ISBN..." 
+               autocomplete="off">
+        <button class="btn btn-primary" onclick="searchBooks()">
+          <i class="fas fa-search"></i> Search
+        </button>
       </div>
-      <div class="mb-3">
-        <input type="text" class="form-control" id="author" placeholder="Author">
+      <div class="search-filters">
+        <!-- filters here -->
       </div>
-      <div class="mb-3">
-        <input type="text" class="form-control" id="isbn" placeholder="ISBN">
-      </div>
-      <button type="submit" class="btn btn-primary">Update Book</button>
-    </form>
+    </div>
+    <div class="form-container">
+      <form id="updateBookForm">
+        <div class="form-group">
+          <label for="title"><i class="fas fa-book"></i> Title</label>
+          <input type="text" class="form-control" id="title" placeholder="Title">
+        </div>
+        <div class="form-group">
+          <label for="author"><i class="fas fa-user"></i> Author</label>
+          <input type="text" class="form-control" id="author" placeholder="Author">
+        </div>
+        <div class="form-group">
+          <label for="isbn"><i class="fas fa-barcode"></i> ISBN</label>
+          <input type="text" class="form-control" id="isbn" placeholder="ISBN">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Book</button>
+          <a href="books.html" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
+        </div>
+      </form>
+    </div>
   </div>
   <script>
     const id = new URLSearchParams(window.location.search).get("id");

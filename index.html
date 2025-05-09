@@ -1,53 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Library Management</title>
-  <link rel="stylesheet" href="style.css">
-  
-</head>
-<body>
-  <nav class="navbar">
-    <div class="nav-brand">Library Management</div>
-    <div class="nav-links">
-      <a href="index.html" class="active"><i class="fas fa-home"></i> Home</a>
-      <a href="books.html"><i class="fas fa-book"></i> Books</a>
-      <a href="add-book.html"><i class="fas fa-plus"></i> Add Book</a>
-      <a href="search.html"><i class="fas fa-search"></i> Search</a>
-    </div>
-  </nav>
-
-  <div class="hero">
-    <div class="hero-content">
-      <h1>Welcome to Library Management System</h1>
-      <p>Your one-stop solution for managing library resources</p>
-    </div>
-  </div>
-
-  <div class="container">
-    <div class="features">
-      <div class="feature-card">
-        <i class="fas fa-book-open"></i>
-        <h3>View All Books</h3>
-        <p>Browse through our extensive collection of books</p>
-        <a href="books.html" class="btn">View Books</a>
-      </div>
-      
-      <div class="feature-card">
-        <i class="fas fa-plus-circle"></i>
-        <h3>Add New Book</h3>
-        <p>Add new books to the library collection</p>
-        <a href="add-book.html" class="btn">Add Book</a>
-      </div>
-      
-      <div class="feature-card">
-        <i class="fas fa-search"></i>
-        <h3>Search Books</h3>
-        <p>Find books quickly with our search feature</p>
-        <a href="search.html" class="btn">Search</a>
-      </div>
-    </div>
-  </div>
-</body>
+ <head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <title>Library Management</title>
+   <link rel="stylesheet" href="style.css">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+ </head>
+ <body>
+   <nav class="navbar">
+     <div class="nav-brand">
+       <i class="fas fa-book-reader"></i>
+       Library Management
+     </div>
+     <div class="nav-links">
+       <a href="index.html" class="active">
+         <i class="fas fa-home"></i>
+         <span>Home</span>
+       </a>
+       <a href="books.html">
+         <i class="fas fa-book"></i>
+         <span>Books</span>
+       </a>
+       <a href="add-book.html">
+         <i class="fas fa-plus"></i>
+         <span>Add Book</span>
+       </a>
+       <a href="update-book.html">
+         <i class="fas fa-edit"></i>
+         <span>Update Book</span>
+       </a>
+       <a href="search.html">
+         <i class="fas fa-search"></i>
+         <span>Search</span>
+       </a>
+     </div>
+   </nav>
+ 
+   <div class="hero">
+     <div class="hero-content">
+       <h1><i class="fas fa-book-reader"></i> Welcome to Library Management System</h1>
+       <p>Your one-stop solution for managing library resources efficiently</p>
+     </div>
+   </div>
+ 
+   <div class="container">
+     <div class="features">
+       <a href="books.html" class="feature-card" title="Click to view all books">
+         <div class="feature-icon">
+           <i class="fas fa-book-open"></i>
+         </div>
+         <h3>View All Books</h3>
+         <p>Browse through our extensive collection of books with detailed information and availability status</p>
+       </a>
+       <a href="add-book.html" class="feature-card" title="Add a new book to the library">
+         <div class="feature-icon">
+           <i class="fas fa-circle-plus"></i>
+         </div>
+         <h3>Add New Book</h3>
+         <p>Easily add new books to the library collection with comprehensive details and categorization</p>
+       </a>
+       
+       <a href="search.html" class="feature-card" data-description="Find books quickly and easily">
+         <div class="feature-icon">
+           <i class="fas fa-magnifying-glass"></i>
+         </div>
+         <h3>Search Books</h3>
+         <p>Quickly find books using our advanced search feature with filters and sorting options</p>
+       </a>
+     </div>
+   </div>
+ 
+   <script src="main.js"></script>
+ </body>
 </html>

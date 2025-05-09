@@ -14,6 +14,7 @@
       <a href="index.html"><i class="fas fa-home"></i> Home</a>
       <a href="books.html"><i class="fas fa-book"></i> Books</a>
       <a href="add-book.html"><i class="fas fa-plus"></i> Add Book</a>
+      <a href="update-book.html"><i class="fas fa-edit"></i> Update Book</a>
       <a href="search.html" class="active"><i class="fas fa-search"></i> Search</a>
     </div>
   </nav>
@@ -23,66 +24,45 @@
       <h1><i class="fas fa-search"></i> Search Books</h1>
     </div>
 
-    <div class="search-container">
-      <div class="search-box">
-        <div class="search-input-group">
-          <input type="text" id="searchInput" class="form-control" 
-                 placeholder="Search by title, author, or ISBN..." 
-                 autocomplete="off">
-          <button class="btn btn-primary" onclick="searchBooks()">
-            <i class="fas fa-search"></i> Search
-          </button>
+    <div class="filter-bar" style="display: flex; flex-direction: column; gap: 1rem; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; width: 100%;">
+      <form id="searchForm" class="search-form" onsubmit="event.preventDefault(); searchBooks();">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by title, author, or ISBN..." style="width: 800px; max-width: 100%; min-width: 250px;">
+        <div style="display: flex; gap: 1rem; width: 100%; justify-content: flex-start;">
+          <button type="button" class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+          <button class="btn btn-success" onclick="window.location.href='add-book.html'">Create Book</button>
         </div>
-        <div class="search-filters">
-          <label class="filter-label">
-            <input type="checkbox" id="searchTitle" checked> Title
-          </label>
-          <label class="filter-label">
-            <input type="checkbox" id="searchAuthor" checked> Author
-          </label>
-          <label class="filter-label">
-            <input type="checkbox" id="searchISBN" checked> ISBN
-          </label>
-        </div>
-      </div>
+      </form>
+    </div>
 
-      <div id="searchResults" class="search-results">
-        <div class="initial-state">
-          <i class="fas fa-search"></i>
-          <p>Enter your search terms above to find books</p>
-        </div>
+    <div id="searchResults" class="search-results">
+      <div class="initial-state">
+        <i class="fas fa-search"></i>
+        <p>Enter your search terms above to find books</p>
       </div>
     </div>
+
+    <ul id="suggestions" class="suggestions-list" style="position: absolute; background: #fff; border: 1px solid #ccc; z-index: 10; width: 100%; display: none;"></ul>
   </div>
 
   <script>
-    let searchTimeout;
+    // Add event listener for Enter key
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        searchBooks();
+      }
+    });
 
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        if (e.target.value.length >= 2) {
-          searchBooks();
-        } else {
-          document.getElementById('searchResults').innerHTML = `
-            <div class="initial-state">
-              <i class="fas fa-search"></i>
-              <p>Enter at least 2 characters to search</p>
-            </div>
-          `;
-        }
-      }, 300);
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      searchBooks();
     });
 
     function searchBooks() {
-      const searchTerm = document.getElementById('searchInput').value;
-      const searchTitle = document.getElementById('searchTitle').checked;
-      const searchAuthor = document.getElementById('searchAuthor').checked;
-      const searchISBN = document.getElementById('searchISBN').checked;
+      const query = document.getElementById('searchInput').value.trim();
 
-      if (searchTerm.length < 2) return;
-
-      // Show loading state
+      // Show loading
       document.getElementById('searchResults').innerHTML = `
         <div class="loading-state">
           <i class="fas fa-spinner fa-spin"></i>
@@ -90,48 +70,74 @@
         </div>
       `;
 
-      fetch(`/books/search?q=${encodeURIComponent(searchTerm)}&title=${searchTitle}&author=${searchAuthor}&isbn=${searchISBN}`)
+      if (!query) {
+        document.getElementById('searchResults').innerHTML = `
+          <div class="initial-state">
+            <i class="fas fa-search"></i>
+            <p>Enter your search terms above to find books</p>
+          </div>
+        `;
+        return;
+      }
+
+      fetch(`/books/search?q=${encodeURIComponent(query)}`)
         .then(res => res.json())
         .then(data => {
-          const resultsDiv = document.getElementById('searchResults');
-          
-          if (data.length === 0) {
-            resultsDiv.innerHTML = `
+          if (!data.length) {
+            document.getElementById('searchResults').innerHTML = `
               <div class="no-results">
                 <i class="fas fa-book-open"></i>
-                <p>No books found matching your search</p>
-                <p class="search-tip">Try different keywords or check your spelling</p>
+                <p>Book is unavailable</p>
               </div>
             `;
             return;
           }
-
-          resultsDiv.innerHTML = `
-            <div class="results-header">
-              <h3>Found ${data.length} results</h3>
-            </div>
-            <div class="results-grid">
-              ${data.map(book => `
-                <div class="book-card">
-                  <div class="book-info">
-                    <h4>${book.title}</h4>
-                    <p class="author"><i class="fas fa-user"></i> ${book.author}</p>
-                    <p class="isbn"><i class="fas fa-barcode"></i> ${book.isbn}</p>
-                  </div>
-                  <div class="book-actions">
-                    <a href="update-book.html?id=${book.id}" class="btn btn-sm btn-warning">
-                      <i class="fas fa-edit"></i> Edit
-                    </a>
-                    <button onclick="deleteBook(${book.id})" class="btn btn-sm btn-danger">
-                      <i class="fas fa-trash"></i> Delete
-                    </button>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
+          if (data.length === 1) {
+            const book = data[0];
+            document.getElementById('searchResults').innerHTML = `
+              <div class="book-details" style="margin-bottom: 2rem; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; background: #fafbfc;">
+                <h2>${book.title}</h2>
+                <p><strong>Author:</strong> ${book.author}</p>
+                <p><strong>ISBN:</strong> ${book.isbn}</p>
+                <p><strong>Publishing Year:</strong> ${book.year || '-'}</p>
+                <p><strong>Publisher:</strong> ${book.publisher || '-'}</p>
+                <p><strong>Availability:</strong> ${book.availability || book.status || 'Available'}</p>
+              </div>
+            `;
+            // Optionally, you can return here if you don't want to show the table for a single result
+            // return;
+          }
+          document.getElementById('searchResults').innerHTML = `
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Modified At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.map(book => `
+                  <tr>
+                    <td>${book.id}</td>
+                    <td>${book.title}</td>
+                    <td>${book.status || 'Available'}</td>
+                    <td>${book.createdAt || '-'}</td>
+                    <td>${book.modifiedAt || '-'}</td>
+                    <td>
+                      <a href="update-book.html?id=${book.id}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                      <button onclick="deleteBook(${book.id})" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
           `;
         })
-        .catch(error => {
+        .catch(() => {
           document.getElementById('searchResults').innerHTML = `
             <div class="error-state">
               <i class="fas fa-exclamation-circle"></i>
@@ -147,28 +153,73 @@
           method: 'DELETE'
         })
         .then(() => {
-          // Remove the book card with animation
-          const card = document.querySelector(`.book-card[data-id="${id}"]`);
-          card.style.opacity = '0';
-          setTimeout(() => {
-            card.remove();
-            // Check if no results left
-            if (document.querySelectorAll('.book-card').length === 0) {
-              document.getElementById('searchResults').innerHTML = `
-                <div class="no-results">
-                  <i class="fas fa-book-open"></i>
-                  <p>No books found matching your search</p>
-                  <p class="search-tip">Try different keywords or check your spelling</p>
-                </div>
-              `;
-            }
-          }, 300);
+          // Remove the book row with animation
+          const row = document.querySelector(`tr[data-id="${id}"]`);
+          if (row) {
+            row.style.opacity = '0';
+            setTimeout(() => {
+              row.remove();
+              // Check if no results left
+              if (document.querySelectorAll('tbody tr').length === 0) {
+                document.getElementById('searchResults').innerHTML = `
+                  <div class="no-results">
+                    <i class="fas fa-book-open"></i>
+                    <p>No books found matching your search</p>
+                  </div>
+                `;
+              }
+            }, 300);
+          }
         })
         .catch(error => {
           alert('Error deleting book. Please try again.');
         });
       }
     }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('searchResults').innerHTML = `
+        <div class="initial-state">
+          <i class="fas fa-search"></i>
+          <p>Enter your search terms above to find books</p>
+        </div>
+      `;
+      document.getElementById('suggestions').style.display = 'none';
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const query = this.value.trim();
+      const suggestionsList = document.getElementById('suggestions');
+      if (query.length < 2) {
+        suggestionsList.style.display = 'none';
+        return;
+      }
+      fetch(`/books/search?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.length) {
+            suggestionsList.style.display = 'none';
+            return;
+          }
+          suggestionsList.innerHTML = data.map(book => 
+            `<li style="padding: 0.5rem; cursor: pointer;" onclick="selectSuggestion('${book.title}')">${book.title}</li>`
+          ).join('');
+          suggestionsList.style.display = 'block';
+        });
+    });
+
+    function selectSuggestion(title) {
+      document.getElementById('searchInput').value = title;
+      document.getElementById('suggestions').style.display = 'none';
+      searchBooks();
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('#searchInput')) {
+        document.getElementById('suggestions').style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html>
